@@ -19,7 +19,9 @@ export default abstract class TargetAbstract {
         };
     }
 
-    protected readonly cache = {};
+    protected readonly cache : {
+        [key: string]: any
+    } = {};
 
     protected async get(url: string, process: (response: { data: any }) => any) {
         return axios.get(url).then(response => {
