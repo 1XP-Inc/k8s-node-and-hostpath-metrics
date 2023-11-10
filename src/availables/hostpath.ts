@@ -59,16 +59,13 @@ export default class Hostpath extends TargetAbstract {
 
     protected async updateVolumeBytes(mount: string): Promise<void> {
 
-        return await this.df({prefixMultiplier: 'MB', precision: 0}).then((response: any) => {
-            const mountInfo = response.find((item: any) => {
-                return item.mount === mount;
-            });
-
-            if (mountInfo) {
+        return await this.df({prefixMultiplier: 'KiB', precision: 0}).then((response: any) => {
+            response.filter((item: any) => {
+                return mount.split(',').includes(item.mount)
+            }).forEach((mountInfo: any) => {
                 this.usedMegaBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.used);
                 this.capacityMegaBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.size);
-            }
-
+            });
 
         });
 

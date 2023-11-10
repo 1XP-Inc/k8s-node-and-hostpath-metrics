@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
-    "start_local": "PORT=27770 MOUNT=/System/Volumes/Data ./node_modules/.bin/nodemon --watch src -e ts --delay 2 src/index.ts",
+    "start_local": "PORT=27770 MOUNT=/System/Volumes/Data,/dev ./node_modules/.bin/nodemon --watch src -e ts --delay 2 src/index.ts",
     "start": "./node_modules/.bin/ts-node src/index.ts",
     "build": "./node_modules/.bin/tsc --build"
   },
