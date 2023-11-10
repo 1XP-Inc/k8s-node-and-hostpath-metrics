@@ -21,15 +21,21 @@ export default class Hostpath extends TargetAbstract {
 
     protected readonly registry = new Registry();
 
-    protected readonly usedMegaBytesGauge = new Gauge({
-        name: `${this.metricPrefix}_used_mega_bytes`,
+    protected readonly usedKiloBytesGauge = new Gauge({
+        name: `${this.metricPrefix}_used_kilo_bytes`,
         help: 'Used bytes of mount',
         labelNames: ['storage_class', 'mount', 'filesystem']
     });
 
-    protected readonly capacityMegaBytesGauge = new Gauge({
-        name: `${this.metricPrefix}_capacity_mega_bytes`,
+    protected readonly capacityKiloBytesGauge = new Gauge({
+        name: `${this.metricPrefix}_capacity_kilo_bytes`,
         help: 'Capacity bytes of mount',
+        labelNames: ['storage_class', 'mount', 'filesystem']
+    });
+
+    protected readonly availableKiloBytesGauge = new Gauge({
+        name: `${this.metricPrefix}_available_kilo_bytes`,
+        help: 'Available bytes of mount',
         labelNames: ['storage_class', 'mount', 'filesystem']
     });
 
@@ -37,8 +43,9 @@ export default class Hostpath extends TargetAbstract {
     public constructor(protected readonly mount: string) {
         super(mount);
 
-        this.registry.registerMetric(this.usedMegaBytesGauge);
-        this.registry.registerMetric(this.capacityMegaBytesGauge);
+        this.registry.registerMetric(this.usedKiloBytesGauge);
+        this.registry.registerMetric(this.capacityKiloBytesGauge);
+        this.registry.registerMetric(this.availableKiloBytesGauge);
     }
 
     public async makeMetrics(): Promise<string> {
@@ -63,8 +70,9 @@ export default class Hostpath extends TargetAbstract {
             response.filter((item: any) => {
                 return mount.split(',').includes(item.mount)
             }).forEach((mountInfo: any) => {
-                this.usedMegaBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.used);
-                this.capacityMegaBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.size);
+                this.capacityKiloBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.size);
+                this.usedKiloBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.used);
+                this.availableKiloBytesGauge.labels(this.storageClass, mountInfo.mount, mountInfo.filesystem).set(mountInfo.available);
             });
 
         });
